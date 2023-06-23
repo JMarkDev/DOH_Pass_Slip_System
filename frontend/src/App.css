@@ -1,42 +1,90 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.navbar{
+  text-align: center;
+  padding: 10px;
+}
+
+body{
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image: url(./assets/277545788_346462727503794_2429890522423356628_n.jpg);
+}
+
+.pass_slip{
+  box-shadow: 0px 100px 100px 100px rgba(0,0,0,0.1);
+  border-radius: 7px;
+  margin: auto;
+  padding: 20px;
+  /* display: flex;
+  justify-content: center;
+  align-items: center; */
+  background-color: #fff;
+  color: #615e5e;
+  width: 50vw;
+  height: 80vh;
+  font-size: 20px;
+}
+
+.title{
+  padding: 0 0 10px 0;
+}
+
+.title, .title__2, .title__3, .title__4{
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.date{
+  margin: 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.date input{
+  padding: 8px;
+  border-radius: 5px;
+  width: 250px;
+  /* border: none; */
+}
+
+.title__3{
+  margin: 20px 0;
+}
+
+.select{
+  text-align: center;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.select1{
+  padding-left: 10px;
+}
+
+.submit__btn{
+  float: right;
+  padding: 7px 20px;
+  border: none;
+  margin-top: 20px;
+  background-color: rgb(243, 47, 47);
+  color: #fff;
+  border-radius: 50px;
+  font-size: 16px;
+}
+
+.submit__btn:hover{
+  background-color: rgb(214, 98, 98);;
+}
+
+@media only screen and (max-width: 968px)  {
+  .pass_slip{
+    width: 100vw;
+    margin: 20px;
   }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }
