@@ -1,0 +1,14 @@
+.request{
+    margin-right: -0px !important;
+    width: calc(100% - 250px);
+    position: absolute;
+    right: 0;
+    top: 80px;
+    bottom: 0;
+}
+
+.top__request{
+    display: flex;
+    justify-content: space-between;
+    padding: 0 0 20px 0;
+}

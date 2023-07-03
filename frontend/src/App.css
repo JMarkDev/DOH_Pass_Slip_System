@@ -4,9 +4,23 @@
   box-sizing: border-box;
 }
 
+.dashboard{
+  margin: 0 40px;
+  background-color: #fff;
+}
+.hide-sidebar .show_links{
+  display: none;
+}
 .navbar{
-  text-align: center;
+  margin-left: 20px;
+  color: #fff;
   padding: 10px;
+}
+
+.details{
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
 }
 
 body{
@@ -20,13 +34,12 @@ body{
   border-radius: 7px;
   margin: auto;
   padding: 20px;
-  /* display: flex;
-  justify-content: center;
-  align-items: center; */
+  padding-bottom: 70px;
+  margin-bottom: 10px;
   background-color: #fff;
   color: #615e5e;
-  width: 50vw;
-  height: 80vh;
+  width: 700px;
+  height: 100%;
   font-size: 20px;
 }
 
@@ -43,13 +56,18 @@ body{
   display: flex;
   justify-content: space-between;
   align-content: center;
+  flex-wrap: wrap;
 }
 
 .date input{
+  border: 2px solid #ccc;
+  border-radius: 4px;
   padding: 8px;
-  border-radius: 5px;
-  width: 250px;
-  /* border: none; */
+  width: 300px;
+}
+
+.date input[type=text]{
+ font-size: 16px;
 }
 
 .title__3{
@@ -82,9 +100,33 @@ body{
   background-color: rgb(214, 98, 98);;
 }
 
-@media only screen and (max-width: 968px)  {
+.text__area{
+  width: 100%;
+  resize: none;
+}
+
+@media only screen and (max-width: 780px)  {
   .pass_slip{
-    width: 100vw;
-    margin: 20px;
+    width: calc(100vw - 40px);
+  }
+
+  .date{
+    display: flex;
+    justify-content: center;
+  }
+
+  .details{
+    display: flex;
+    justify-content: center;
+  }
+
+  .date input{
+    width: 420px;
+  }
+}
+
+@media only screen and (max-width: 480px)  {
+  .date input{
+    width: 80vw;
   }
 }

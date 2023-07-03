@@ -3,7 +3,7 @@ import React from 'react'
 function Navbar() {
   return (
     <div className='navbar'>
-      <h1>DOH Pass Slip</h1>
+      <h1 style={{fontFamily: 'sans-serif'}}>DOH Pass Slip</h1>
     </div>
   )
 }
