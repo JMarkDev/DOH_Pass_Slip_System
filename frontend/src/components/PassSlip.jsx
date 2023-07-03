@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import axios from "axios";
+import io from "socket.io-client";
 
 function PassSlip() {
   const [selectedOption, setSelectedOption] = useState("");
   const [dateNow, setDateNow] = useState("");
+
+  const socket = io.connect("http://localhost:3001");
 
   const handleAddPasslip = async (e) => {
     e.preventDefault();
@@ -35,7 +38,10 @@ function PassSlip() {
         "http://localhost:3001/request/add",
         submitData
       );
-      console.log(res);
+      console.log(res.data);
+      if (res.data.succes) {
+        socket.emit("send_request", submitData);
+      }
       alert(res.data.msg);
     } catch (e) {
       console.log(e);
@@ -67,6 +73,7 @@ function PassSlip() {
 
   useEffect(() => {
     getDateTimeNow();
+    setInterval(getDateTimeNow, 100);
   }, []);
 
   const handleOptionChange = (event) => {
@@ -175,7 +182,9 @@ function PassSlip() {
                 rows="5"
               ></textarea>
             </div>
-            <input type="submit" value="Submit" />
+            <button type="submit" className="submit__btn">
+              Submit
+            </button>
           </form>
         </div>
       </div>
