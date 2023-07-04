@@ -13,11 +13,13 @@ import Sidebar from "./Sidebar";
 import Navbar from "../dashboard/Navbar";
 import PassSlipTemp from "./PassSlipTemp";
 import axios from "axios";
+import io from "socket.io-client";
 
 function Dashboard() {
   const [activeOrderId, setActiveOrderId] = useState(null);
   const [showModalId, setShowModalId] = useState(null);
   const [requestData, setRequestData] = useState([]);
+  const socket = io.connect("http://localhost:3001");
 
   const requestStatus = (orderId) => {
     setActiveOrderId((prevOrderId) =>
@@ -79,10 +81,19 @@ function Dashboard() {
     return formattedDate;
   };
 
+  const compareDateTime = (a, b) => {
+    const dateA = new Date(a.time_out);
+    const dateB = new Date(b.time_out);
+
+    return dateB - dateA;
+  };
+
   const handleRequestData = async () => {
     try {
-      const { data } = await axios.get("http://localhost:3001/request");
-      setRequestData(data.data);
+      let { data } = await axios.get("http://localhost:3001/request");
+      const tempData = data.data;
+      const sorted = tempData.sort(compareDateTime);
+      setRequestData(sorted);
     } catch (e) {
       console.log(e);
     }
@@ -90,6 +101,10 @@ function Dashboard() {
 
   useEffect(() => {
     handleRequestData();
+
+    socket.on("receive_request", (data) => {
+      handleRequestData();
+    });
   }, []);
 
   return (
@@ -202,7 +217,7 @@ function Dashboard() {
         </div>
       </div>
       {/* Modal */}
-      {recentRequest.map((request) => (
+      {requestData.map((request) => (
         <Modal
           key={request.id}
           show={showModalId === request.id}
