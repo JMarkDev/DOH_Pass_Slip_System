@@ -1,106 +1,154 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../style/Dashboard.css";
-import {BsThreeDots} from "react-icons/bs"
-import {AiFillPrinter} from "react-icons/ai"
-import {FiCheckCircle} from "react-icons/fi"
-import "../style/Dashboard.css"
-
+import { BsThreeDots } from "react-icons/bs";
+import { AiFillPrinter } from "react-icons/ai";
+import { FiCheckCircle } from "react-icons/fi";
+import "../style/Dashboard.css";
+import axios from "axios";
+import io from "socket.io-client";
 function Verifier() {
-    const [activeOrderId, setActiveOrderId] = useState(null);
-    const requestStatus = (orderId) => {
-        setActiveOrderId((prevOrderId) => (prevOrderId === orderId ? null : orderId));
-        document.body.classList.add("status");
-      };
-    
-      const recentRequest = [
-    
-        { id: 1,
-          requestDate: "January 01 2023",
-          employeeName: "Falmark Lumpoc",
-          requestFor: "Personal",
-          position: "IT",
-          locationVisited: "Pagadian City Department Of Health",
-          status: "Approved",
-        },
-        { id: 2,
-          requestDate: "January 01 2023",
-          employeeName: "Falmark Lumpoc",
-          requestFor: "Personal",
-          position: "IT",
-          locationVisited: "Pagadian City Department Of Health",
-          status: "Approved",
-        }
-      ];
-    
-      const getRequestStatusClass = (status) => {
-        if (status === "Pending") {
-          return "pending";
-        } else if (status === "Approved") {
-          return "approved";
-        } else if (status === "Cancelled") {
-          return "cancelled";
-        } else if (status === "Completed") {
-          return "completed"
-        }
-    
-        return ""; // empty string if status is unknown
-      };
+  const [activeOrderId, setActiveOrderId] = useState(null);
+  const [passlips, setPasslips] = useState([]);
+  const socket = io.connect("http://localhost:3001");
+  const requestStatus = (orderId) => {
+    setActiveOrderId((prevOrderId) =>
+      prevOrderId === orderId ? null : orderId
+    );
+    document.body.classList.add("status");
+  };
+
+  const allApproveSlips = async () => {
+    const APPROVE = 2;
+
+    try {
+      const { data } = await axios.get(
+        `http://localhost:3001/request/all/${APPROVE}`
+      );
+      setPasslips(data.result);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    allApproveSlips();
+    socket.on("show_approve", (data) => {
+      if (data.success) {
+        allApproveSlips();
+      }
+    });
+  }, []);
+
+  const recentRequest = [
+    {
+      id: 1,
+      requestDate: "January 01 2023",
+      employeeName: "Falmark Lumpoc",
+      requestFor: "Personal",
+      position: "IT",
+      locationVisited: "Pagadian City Department Of Health",
+      status: "Approved",
+    },
+    {
+      id: 2,
+      requestDate: "January 01 2023",
+      employeeName: "Falmark Lumpoc",
+      requestFor: "Personal",
+      position: "IT",
+      locationVisited: "Pagadian City Department Of Health",
+      status: "Approved",
+    },
+  ];
+
+  const getRequestStatusClass = (status) => {
+    console.log(status);
+    if (status === 1) {
+      return "pending";
+    } else if (status === 2) {
+      return "Approved";
+    } else if (status === 3) {
+      return "cancelled";
+    } else if (status === 4) {
+      return "completed";
+    }
+
+    return "";
+  };
+  const getStatus = (status) => {
+    if (status === 1) {
+      return "Pending";
+    } else if (status === 2) {
+      return "Approved";
+    } else if (status === 3) {
+      return "Cancelled";
+    } else if (status === 4) {
+      return "Completed";
+    } else {
+      return "";
+    }
+  };
   return (
     <div className="verifier">
-    <div className="dashboard-table">
-    <h2 className="table-title">Recent Request</h2>
-    <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-  <thead>
-    <tr>
-    <th>Request Id</th>
-    <th>Request Date</th>
-    <th>Employee Name</th>
-    <th>Request For</th>
-    <th>Position</th>
-    <th>Location</th>
-    <th>Status</th>
-    <th>Action</th> 
-    </tr>
-  </thead>
-  <tbody>
-    {recentRequest.map((request) => (
-<tr key={request.id}>
-<td>{request.id}</td>
-<td>{request.requestDate}</td>
-<td>{request.employeeName}</td>
-<td>{request.requestFor}</td>
-<td>{request.position}</td>
-<td>{request.locationVisited}</td>
-<td>
-  <p className={`order_status ${getRequestStatusClass(request.status)}`}>
-    {request.status}
-  </p>
-</td>
-<td className="set_status">
-  <BsThreeDots className="status_icon" 
-  onClick={() => requestStatus(request.id)} />
-  {activeOrderId === request.id && (
-          <div className="select_status">
-            <button className="link_status">
-          <FiCheckCircle className="link_icon accept_icon" />
-            Completed
-          </button>
-          <button className="link_status">
-          <AiFillPrinter className="link_icon view_icon" />
-            Print
-          </button>
-        </div>
-  )}
-
-</td>
-</tr>
-))}
-
-  </tbody>
-</table>
-</div>
-</div>
-  )
+      <div className="dashboard-table">
+        <h2 className="table-title">Recent Request</h2>
+        <table style={{ borderCollapse: "collapse", width: "100%" }}>
+          <thead>
+            <tr>
+              <th>Request Id</th>
+              <th>Request Date</th>
+              <th>Employee Name</th>
+              <th>Request For</th>
+              <th>Position</th>
+              <th>Location</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {passlips.map((passlip) => (
+              <tr key={passlip.id}>
+                <td>{passlip.id}</td>
+                <td>{passlip.time_out}</td>
+                <td>
+                  {passlip.first_name} {passlip.last_name}
+                </td>
+                <td>{passlip.request_type === 1 ? "Personal" : "Official"}</td>
+                <td>{passlip.position}</td>
+                <td>{passlip.location}</td>
+                <td>
+                  <p
+                    className={`order_status ${getRequestStatusClass(
+                      passlip.status
+                    )}`}
+                  >
+                    {getStatus(passlip.status)}
+                  </p>
+                </td>
+                <td className="set_status">
+                  <BsThreeDots
+                    className="status_icon"
+                    onClick={() => requestStatus(passlip.id)}
+                  />
+                  {activeOrderId === passlip.id && (
+                    <div className="select_status">
+                      <button className="link_status">
+                        <FiCheckCircle className="link_icon accept_icon" />
+                        Completed
+                      </button>
+                      <button className="link_status">
+                        <AiFillPrinter className="link_icon view_icon" />
+                        Print
+                      </button>
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 }
 
-export default Verifier
+export default Verifier;

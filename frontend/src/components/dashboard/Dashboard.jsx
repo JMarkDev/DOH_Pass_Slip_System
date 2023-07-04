@@ -89,11 +89,33 @@ function Dashboard() {
   };
 
   const handleRequestData = async () => {
+    const PENDING = 1;
     try {
-      let { data } = await axios.get("http://localhost:3001/request");
-      const tempData = data.data;
+      let { data } = await axios.get(
+        `http://localhost:3001/request/all/${PENDING}`
+      );
+      console.log(data);
+      const tempData = data.result;
       const sorted = tempData.sort(compareDateTime);
+      // if (data.result) {
+      //   console.log("YOU SUCKCESS");
+      // }
       setRequestData(sorted);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const handleApprove = async (id) => {
+    const APPROVE = 2;
+    try {
+      const { data } = await axios.put(
+        `http://localhost:3001/request/update/${APPROVE}/${id}`
+      );
+      if (data.success) {
+        handleRequestData();
+        socket.emit("send_aprrove", { success: true });
+      }
     } catch (e) {
       console.log(e);
     }
@@ -195,7 +217,10 @@ function Dashboard() {
                     />
                     {activeOrderId === request.id && (
                       <div className="select_status">
-                        <button className="link_status">
+                        <button
+                          className="link_status"
+                          onClick={() => handleApprove(request.id)}
+                        >
                           <BiDislike className="link_icon view_icon" />
                           Approved
                         </button>
