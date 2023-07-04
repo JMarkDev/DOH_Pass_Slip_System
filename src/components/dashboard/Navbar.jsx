@@ -21,23 +21,33 @@ function Navbar({ showSidebar, handleSidebarToggle }) {
   const [dateNow, setDateNow] = useState('');
 
   useEffect(() => {
-    const today = new Date();
-    const month = monthNames[today.getMonth()];
-    const date = month + ' ' + today.getDate() + ', ' + today.getFullYear();
+    const updateDateTime = () => {
+      const today = new Date();
+      const month = monthNames[today.getMonth()];
+      const date = month + ' ' + today.getDate() + ', ' + today.getFullYear();
 
-    function getHours() {
-      const options = {
-        hour: 'numeric',
-        minute: 'numeric',
-        second: 'numeric',
-        hour12: true,
-      };
+      function getHours() {
+        const options = {
+          hour: 'numeric',
+          minute: 'numeric',
+          second: 'numeric',
+          hour12: true,
+        };
 
-      return today.toLocaleString('en-US', options);
-    }
+        return today.toLocaleString('en-US', options);
+      }
 
-    const time = getHours();
-    setDateNow(date + ' ' + time);
+      const time = getHours();
+      setDateNow(date + ' ' + time);
+    };
+
+    updateDateTime(); // Call it initially to avoid delay on the first render
+
+    const intervalId = setInterval(updateDateTime, 1000); // Update every second
+
+    return () => {
+      clearInterval(intervalId); // Clean up the interval on component unmount
+    };
   }, []);
 
   return (

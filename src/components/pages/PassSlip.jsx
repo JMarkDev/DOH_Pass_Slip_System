@@ -16,10 +16,10 @@ function PassSlip() {
     const first_name = formData.get("first_name");
     const middle_name = formData.get("middle_name");
     const last_name = formData.get("last_name");
-    const position = formData.get("position");
-    const phone_no = formData.get("phone_no");
     const time_out = dateNow;
     const request_type = selectedOption;
+    const position = formData.get("position");
+    const phone_no = formData.get("phone_no");
     const location = formData.get("location");
 
     const submitData = {
@@ -29,8 +29,8 @@ function PassSlip() {
       time_out: time_out,
       request_type: request_type,
       position: position,
-      location: location,
       phone_no: phone_no,
+      location: location,
     };
 
     try {
@@ -39,7 +39,7 @@ function PassSlip() {
         submitData
       );
       console.log(res.data);
-      if (res.data.success) {
+      if (res.data.succes) {
         socket.emit("send_request", submitData);
       }
       alert(res.data.msg);

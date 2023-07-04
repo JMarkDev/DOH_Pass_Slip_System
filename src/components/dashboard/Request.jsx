@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
+import PassSlipTemp from "./PassSlipTemp";
+import { Modal } from "react-bootstrap";
 import { MdDeleteOutline } from "react-icons/md";
 import { BsThreeDots } from "react-icons/bs";
 import { BiDislike } from "react-icons/bi";
@@ -8,10 +10,13 @@ import { FiXCircle } from "react-icons/fi";
 import { AiOutlineSearch } from "react-icons/ai";
 import "../style/Request.css";
 import axios from "axios";
+import io from "socket.io-client";
 
 function Request() {
   const [activeOrderId, setActiveOrderId] = useState(null);
-  const [requestData, setDataRequest] = useState([]);
+  const [showModalId, setShowModalId] = useState(null);
+  const [requestData, setRequestData] = useState([]);
+  const socket = io.connect("http://localhost:3001");
 
   const requestStatus = (orderId) => {
     setActiveOrderId((prevOrderId) =>
@@ -19,47 +24,83 @@ function Request() {
     );
     document.body.classList.add("status");
   };
-  const recentRequest = [
-    {
-      id: 1,
-      requestDate: "2023-7-2 12:58:48 PM",
-      employeeName: "Falmark Lumpoc",
-      requestFor: "Personal",
-      position: "IT",
-      // locationVisited: "Pagadian City Department Of Health",
-      status: "Pending",
-    },
-    {
-      id: 2,
-      requestDate: "2023-7-2 12:58:48 PM",
-      employeeName: "Falmark Lumpoc",
-      requestFor: "Personal",
-      position: "IT",
-      // locationVisited: "Pagadian City Department Of Health",
-      status: "Pending",
-    },
-  ];
+
+  const handleApproved = async (id) => {
+    const APPROVED_STATUS = 2
+
+    try {
+      const {data} = await axios.put(`http://localhost:3001/request/update/${APPROVED_STATUS}/${id}`)
+      alert(data.msg)
+      if(data.success){
+        handleRequestData()
+      }
+
+    }catch (e) {
+      console.log(e)
+    }
+  }
+
+  const handleCancelled = async (id) => { 
+    const CANCELLED_STATUS = 3;
+
+    try{
+      const {data} = await axios.put(`http://localhost:3001/request/update/${CANCELLED_STATUS}/${id}`)
+      alert(data.msg)
+      if(data.success){
+        handleRequestData()
+      }
+    }
+    catch(e) {
+      console.log(e)
+    }
+  }
+
+  const handleDeleted = async (id) => {
+    try{
+      const {data} = await axios.delete(`http://localhost:3001/request/delete/${id}`)
+      alert(data.msg)
+      if(data.success){
+        handleRequestData()
+      }
+    }
+    catch (e){
+      console.log(e)
+    }
+  }
+
+  const openModal = (orderId) => {
+    setShowModalId(orderId);
+  };
+
+  const closeModal = () => {
+    setShowModalId(null);
+  };
 
   const getRequestStatusClass = (status) => {
-    if (status === "Pending") {
+    if (status === 1) {
       return "pending";
-    } else if (status === "Approved") {
-      return "Approved";
-    } else if (status === "Cancelled") {
+    } else if (status === 2) {
+      return "approved";
+    } else if (status === 3) {
       return "cancelled";
-    } else if (status === "Completed") {
+    } else if (status === 4) {
       return "completed";
     }
 
-    return ""; // empty string if status is unknown
+    return "";
   };
 
-  const handleRequestData = async () => {
-    try {
-      const res = await axios.get("http://localhost:3001/request");
-      console.log(res);
-    } catch (e) {
-      console.log(e);
+  const getStatus = (status) => {
+    if (status === 1) {
+      return "Pending";
+    } else if (status === 2) {
+      return "Approved";
+    } else if (status === 3) {
+      return "Cancelled";
+    } else if (status === 4) {
+      return "Completed";
+    } else {
+      return "";
     }
   };
 
@@ -80,9 +121,30 @@ function Request() {
     return formattedDate;
   };
 
+  const compareDateTime = (a, b) => {
+    const dateA = new Date(a.time_out);
+    const dateB = new Date(b.time_out);
+
+    return dateB - dateA;
+  };
+
+  const handleRequestData = async () => {
+    try {
+      let { data } = await axios.get("http://localhost:3001/request");
+      const tempData = data.data;
+      const sorted = tempData.sort(compareDateTime);
+      setRequestData(sorted);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
     handleRequestData();
-    console.log("hi");
+
+    socket.on("receive_request", (data) => {
+      handleRequestData();
+    });
   }, []);
 
   return (
@@ -109,74 +171,46 @@ function Request() {
           <table>
             <thead>
               <tr>
-                {/* <th>Request Id</th> */}
                 <th>Request Date</th>
                 <th>Employee Name</th>
                 <th>Request For</th>
                 <th>Position</th>
-                {/* <th>Location</th> */}
                 <th>Status</th>
                 <th colSpan={2}>Action</th>
               </tr>
             </thead>
             <tbody>
-              {recentRequest.map((request) => (
+              {requestData.map((request) => (
                 <tr key={request.id}>
-                  {/* <td>{request.id}</td> */}
-                  <td>{request.requestDate}</td>
-                  <td>{request.employeeName}</td>
-                  <td>{request.requestFor}</td>
+                  <td>{toDateTimeString(request.time_out)}</td>
+                  <td>
+                    {request.first_name} {request.last_name}
+                  </td>
+                  <td>
+                    {request.request_type === 1
+                      ? "Personal"
+                      : request.request_type === 2
+                      ? "Official"
+                      : "No Request Type"}
+                  </td>
                   <td>{request.position}</td>
-                  {/* <td>{request.locationVisited}</td> */}
                   <td>
                     <p
                       className={`order_status ${getRequestStatusClass(
                         request.status
                       )}`}
                     >
-                      {request.status}
+                      {getStatus(request.status)}
                     </p>
                   </td>
                   <td>
                     <button
                       type="button"
                       className="btn btn-primary"
-                      data-bs-toggle="modal"
-                      data-bs-target="#exampleModal"
+                      onClick={() => openModal(request.id)}
                     >
                       View
                     </button>
-
-                    <div
-                      className="modal fade"
-                      id="exampleModal"
-                      tabIndex="-1"
-                      aria-labelledby="exampleModalLabel"
-                      aria-hidden="true"
-                    >
-                      <div className="modal-dialog">
-                        <div className="modal-content">
-                          <div className="modal-header">
-                            <h1
-                              className="modal-title fs-5"
-                              id="exampleModalLabel"
-                            >
-                              Pass Slip
-                            </h1>
-                          </div>
-                          <div className="modal-body"></div>
-                          <div className="modal-footer">
-                            <button
-                              type="button"
-                              className="btn btn-secondary"
-                              data-bs-dismiss="modal"
-                            >
-                              Close
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
                   </td>
                   <td className="set_status">
                     <BsThreeDots
@@ -185,19 +219,15 @@ function Request() {
                     />
                     {activeOrderId === request.id && (
                       <div className="select_status">
-                        {/* <Link to="/" className="link_status">
-              <FiAlertCircle className="link_icon view_icon" />
-                Pending
-              </Link> */}
-                        <button className="link_status">
+                        <button className="link_status" onClick={() => handleApproved(request.id)}>
                           <BiDislike className="link_icon view_icon" />
                           Approved
                         </button>
-                        <button className="link_status">
+                        <button className="link_status" onClick={() => handleCancelled(request.id)}>
                           <FiXCircle className="link_icon reject_icon" />
                           Cancel
                         </button>
-                        <button className="link_status">
+                        <button className="link_status" onClick={() => handleDeleted(request.id)}>
                           <MdDeleteOutline className="link_icon accept_icon" />
                           Delete
                         </button>
@@ -210,6 +240,39 @@ function Request() {
           </table>
         </div>
       </div>
+      {/* Modal */}
+      {requestData.map((request) => (
+        <Modal
+          key={request.id}
+          show={showModalId === request.id}
+          onHide={closeModal}
+          aria-labelledby="exampleModalLabel"
+          backdrop="static"
+          keyboard={false}
+        >
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h1 className="modal-title fs-5" id="exampleModalLabel">
+                  Permit Slip
+                </h1>
+              </div>
+              <div className="modal-body">
+                <PassSlipTemp request={request} />
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={closeModal}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      ))}
     </>
   );
 }

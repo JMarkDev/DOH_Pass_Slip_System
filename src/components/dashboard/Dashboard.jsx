@@ -62,7 +62,7 @@ function Dashboard() {
     try{
       const {data} = await axios.delete(`http://localhost:3001/request/delete/${id}`)
       alert(data.msg)
-      if(data.success){
+      if(data.succes){
         handleRequestData()
       }
     }
@@ -132,9 +132,10 @@ function Dashboard() {
   };
 
   const handleRequestData = async () => {
+    const Pending = 1;
     try {
-      let { data } = await axios.get("http://localhost:3001/request");
-      const tempData = data.data;
+      let { data } = await axios.get(`http://localhost:3001/request/all/${Pending}`);
+      const tempData = data.result;
       const sorted = tempData.sort(compareDateTime);
       setRequestData(sorted);
     } catch (e) {
