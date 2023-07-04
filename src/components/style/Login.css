@@ -1,0 +1,135 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .eye{
+    position: absolute;
+    right: 0;
+  }
+
+  .login, .signup{
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      letter-spacing: 1px;
+      /* background-color: #0c1022; */
+  }
+
+  .signup_form_container{
+    width: 400px;
+    height: 600px !important;
+    max-width: 400px;
+    max-height: 600px !important;
+  }
+
+  .login_form_container{
+      position: relative;
+      width: 400px;
+      height: 470px;
+      max-width: 400px;
+      max-height: 470px;
+      /* background: #040717; */
+      border-radius: 50px 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+  }
+  .login_form{
+      position: absolute;
+      content: '';
+      background-color: #fff;
+      border-radius: 50px 5px;
+      inset: 5px;
+      padding: 50px 40px;
+      z-index: 10;
+      color: #333;
+  
+  } 
+  h2{
+      font-size: 40px;
+      font-weight: 600;
+      text-align: center;
+  }
+  .input_group{
+      margin-top: 40px;
+      position:relative;
+      display:flex;
+      align-items: center;
+      justify-content: flex-start;
+  }
+  .input_text{
+      width: 95%;
+      height: 30px;
+      background: transparent;
+      border: none;
+      outline: none;
+      border-bottom: 1px solid #0b0c0c52;
+      font-size: 20px;
+      padding-left: 10px;
+      color: #333;
+  
+  }
+
+  .fa{
+      font-size: 20px;
+  
+  }
+  #login_button{
+      position: relative;
+      width: 300px;
+      height: 40px;
+      transition: 1s;
+      margin-top: 30px;
+  
+  
+  }
+  #login_button button{
+    color: #fff;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      text-decoration: none;
+      z-index: 10;
+      cursor: pointer;
+      font-size: 22px;
+      letter-spacing: 2px;
+      border: 1px solid #00ccff;
+      border-radius: 50px;
+      background-color: #00BCD4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+  .fotter {
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+  
+  }
+
+  .footer__text, .signup__link{
+    /* color: #00ccff52; */
+    padding: 5px;
+    font-size: 15px;
+  }
+
+  .signup__link{
+    font-weight: 300;
+    color: blue;
+  }
+
+  
+
+  .fotter a{
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 18px;
+  }
+  .glowIcon {
+      text-shadow: 0 0 10px #fff;
+  }
