@@ -7,14 +7,16 @@ import { Route, Routes } from 'react-router-dom'
 import Request from './components/dashboard/Request'
 import Verifier from './components/Verifier/Verifier'
 import Archives from './components/dashboard/Archives'
+import Register from './Register'
+import Login from './Login'
 
 function App() {
   const [showSidebar, setShowSidebar] = useState(false);
 
-  const handleSidebarToggle = () => {
-    setShowSidebar(!showSidebar);
-    document.body.classList.toggle("hide-sidebar")
-  }
+  // const handleSidebarToggle = () => {
+  //   setShowSidebar(!showSidebar);
+  //   document.body.classList.toggle("hide-sidebar")
+  // }
 
   return (
     <>
@@ -26,6 +28,8 @@ function App() {
       <Route path='/verifier' element={<Verifier/>}/>
       <Route path='/archives' element={<Archives />}/>
       <Route path="*" element={<Pagenotfound />}/>
+      <Route path='/register' element={<Register />}/>
+      <Route path='/login' element={<Login />}/>
     </Routes>
     </>
   )
