@@ -1,9 +1,9 @@
-import { useState,useEffect } from 'react';
-import Sidebar from './Sidebar'
-import Navbar from './Navbar'
-import PassSlipTemp from './PassSlipTemp';
-import { Modal } from 'react-bootstrap';
-import "../style/Archive.css"
+import { useState, useEffect } from "react";
+import Sidebar from "./Sidebar";
+import Navbar from "./Navbar";
+import PassSlipTemp from "./PassSlipTemp";
+import { Modal } from "react-bootstrap";
+import "../style/Archive.css";
 import axios from "axios";
 import io from "socket.io-client";
 
@@ -16,7 +16,7 @@ function Archives() {
 
   const allCompletedSlips = async () => {
     const COMPLETED = 4;
-  
+
     try {
       const { data } = await axios.get(
         `http://localhost:3001/request/all/${COMPLETED}`
@@ -125,29 +125,32 @@ function Archives() {
 
   return (
     <>
-        <Sidebar />
-        <Navbar />
+      <Sidebar />
+      <Navbar />
       <div className="archives">
-      <div className="dashboard-table">
-        <table>
-      <thead>
-        <tr>
-        <th></th>
-        <th>Request Date</th>
-        <th>Employee Name</th>
-        <th>Request For</th>
-        <th>Position</th>
-        <th>Status</th>
-        <th colSpan={2}>Action</th> 
-        </tr>
-      </thead>
-      <tbody>
+        <div className="dashboard-table">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Request Date</th>
+                <th>Employee Name</th>
+                <th>Request For</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th colSpan={2}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
               {passlips.map((passlip) => (
                 <tr key={passlip.id}>
-                  <td><input type="checkbox" /></td>
+                  <td>
+                    <input type="checkbox" />
+                  </td>
                   <td>{toDateTimeString(passlip.time_out)}</td>
                   <td>
-                  {passlip.first_name} {passlip.middle_name.charAt(0)}. {passlip.last_name}
+                    {passlip.first_name} {passlip.middle_name?.charAt(0) ?? ""}.{" "}
+                    {passlip.last_name}
                   </td>
                   <td>
                     {passlip.request_type === 1
@@ -178,8 +181,8 @@ function Archives() {
                 </tr>
               ))}
             </tbody>
-    </table>
-    </div>
+          </table>
+        </div>
       </div>
       {requestData.map((request) => (
         <Modal
@@ -208,15 +211,16 @@ function Archives() {
                 >
                   Close
                 </button>
-                <button type="button" className="btn btn-primary">Print</button>
+                <button type="button" className="btn btn-primary">
+                  Print
+                </button>
               </div>
             </div>
           </div>
         </Modal>
       ))}
     </>
-
-  )
+  );
 }
 
 export default Archives;

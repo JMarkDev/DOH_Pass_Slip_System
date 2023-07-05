@@ -26,47 +26,50 @@ function Request() {
   };
 
   const handleApproved = async (id) => {
-    const APPROVED_STATUS = 2
+    const APPROVED_STATUS = 2;
 
     try {
-      const {data} = await axios.put(`http://localhost:3001/request/update/${APPROVED_STATUS}/${id}`)
-      alert(data.msg)
-      if(data.success){
-        handleRequestData()
+      const { data } = await axios.put(
+        `http://localhost:3001/request/update/${APPROVED_STATUS}/${id}`
+      );
+      alert(data.msg);
+      if (data.success) {
+        handleRequestData();
       }
-
-    }catch (e) {
-      console.log(e)
+    } catch (e) {
+      console.log(e);
     }
-  }
+  };
 
-  const handleCancelled = async (id) => { 
+  const handleCancelled = async (id) => {
     const CANCELLED_STATUS = 3;
 
-    try{
-      const {data} = await axios.put(`http://localhost:3001/request/update/${CANCELLED_STATUS}/${id}`)
-      alert(data.msg)
-      if(data.success){
-        handleRequestData()
+    try {
+      const { data } = await axios.put(
+        `http://localhost:3001/request/update/${CANCELLED_STATUS}/${id}`
+      );
+      alert(data.msg);
+      if (data.success) {
+        handleRequestData();
       }
+    } catch (e) {
+      console.log(e);
     }
-    catch(e) {
-      console.log(e)
-    }
-  }
+  };
 
   const handleDeleted = async (id) => {
-    try{
-      const {data} = await axios.delete(`http://localhost:3001/request/delete/${id}`)
-      alert(data.msg)
-      if(data.succes){
-        handleRequestData()
+    try {
+      const { data } = await axios.delete(
+        `http://localhost:3001/request/delete/${id}`
+      );
+      alert(data.msg);
+      if (data.succes) {
+        handleRequestData();
       }
+    } catch (e) {
+      console.log(e);
     }
-    catch (e){
-      console.log(e)
-    }
-  }
+  };
 
   const openModal = (orderId) => {
     setShowModalId(orderId);
@@ -184,7 +187,9 @@ function Request() {
                 <tr key={request.id}>
                   <td>{toDateTimeString(request.time_out)}</td>
                   <td>
-                  {request.first_name} {request.middle_name.charAt(0)}. {request.last_name}
+                    {request.first_name}{" "}
+                    {request.middle_name?.charAt(0) + "." ?? ""}
+                    {request.last_name}
                   </td>
                   <td>
                     {request.request_type === 1
@@ -219,15 +224,24 @@ function Request() {
                     />
                     {activeOrderId === request.id && (
                       <div className="select_status">
-                        <button className="link_status" onClick={() => handleApproved(request.id)}>
+                        <button
+                          className="link_status"
+                          onClick={() => handleApproved(request.id)}
+                        >
                           <BiDislike className="link_icon view_icon" />
                           Approved
                         </button>
-                        <button className="link_status" onClick={() => handleCancelled(request.id)}>
+                        <button
+                          className="link_status"
+                          onClick={() => handleCancelled(request.id)}
+                        >
                           <FiXCircle className="link_icon reject_icon" />
                           Cancel
                         </button>
-                        <button className="link_status" onClick={() => handleDeleted(request.id)}>
+                        <button
+                          className="link_status"
+                          onClick={() => handleDeleted(request.id)}
+                        >
                           <MdDeleteOutline className="link_icon accept_icon" />
                           Delete
                         </button>

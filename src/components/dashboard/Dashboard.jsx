@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import "../style/Dashboard.css";
 import {
@@ -14,12 +14,22 @@ import Navbar from "../dashboard/Navbar";
 import PassSlipTemp from "./PassSlipTemp";
 import axios from "axios";
 import io from "socket.io-client";
+import UserContext from "../../context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
   const [activeOrderId, setActiveOrderId] = useState(null);
   const [showModalId, setShowModalId] = useState(null);
   const [requestData, setRequestData] = useState([]);
   const socket = io.connect("http://localhost:3001");
+  const [currentUser] = useContext(UserContext);
+  const navigate = useNavigate();
+
+  // if (!currentUser) {
+  //   navigate("/login");
+  // }
+
+  console.log(currentUser);
 
   const requestStatus = (orderId) => {
     setActiveOrderId((prevOrderId) =>
@@ -29,48 +39,51 @@ function Dashboard() {
   };
 
   const handleApproved = async (id) => {
-    const APPROVED_STATUS = 2
+    const APPROVED_STATUS = 2;
 
     try {
-      const {data} = await axios.put(`http://localhost:3001/request/update/${APPROVED_STATUS}/${id}`)
-      alert(data.msg)
-      if(data.success){
-        handleRequestData()
+      const { data } = await axios.put(
+        `http://localhost:3001/request/update/${APPROVED_STATUS}/${id}`
+      );
+      alert(data.msg);
+      if (data.success) {
+        handleRequestData();
         socket.emit("send_aprrove", { success: true });
       }
-
-    }catch (e) {
-      console.log(e)
+    } catch (e) {
+      console.log(e);
     }
-  }
+  };
 
-  const handleCancelled = async (id) => { 
+  const handleCancelled = async (id) => {
     const CANCELLED_STATUS = 3;
 
-    try{
-      const {data} = await axios.put(`http://localhost:3001/request/update/${CANCELLED_STATUS}/${id}`)
-      alert(data.msg)
-      if(data.success){
-        handleRequestData()
+    try {
+      const { data } = await axios.put(
+        `http://localhost:3001/request/update/${CANCELLED_STATUS}/${id}`
+      );
+      alert(data.msg);
+      if (data.success) {
+        handleRequestData();
       }
+    } catch (e) {
+      console.log(e);
     }
-    catch(e) {
-      console.log(e)
-    }
-  }
+  };
 
   const handleDeleted = async (id) => {
-    try{
-      const {data} = await axios.delete(`http://localhost:3001/request/delete/${id}`)
-      alert(data.msg)
-      if(data.succes){
-        handleRequestData()
+    try {
+      const { data } = await axios.delete(
+        `http://localhost:3001/request/delete/${id}`
+      );
+      alert(data.msg);
+      if (data.succes) {
+        handleRequestData();
       }
+    } catch (e) {
+      console.log(e);
     }
-    catch (e){
-      console.log(e)
-    }
-  }
+  };
 
   const openModal = (orderId) => {
     setShowModalId(orderId);
@@ -135,7 +148,9 @@ function Dashboard() {
   const handleRequestData = async () => {
     const Pending = 1;
     try {
-      let { data } = await axios.get(`http://localhost:3001/request/all/${Pending}`);
+      let { data } = await axios.get(
+        `http://localhost:3001/request/all/${Pending}`
+      );
       const tempData = data.result;
       const sorted = tempData.sort(compareDateTime);
       setRequestData(sorted);
@@ -154,145 +169,162 @@ function Dashboard() {
 
   return (
     <>
-      <Sidebar />
-      <Navbar />
-      <div className="dashboard">
-        <div className="dashboard__card">
-          <div className="cards">
-            <div className="card-icon">
-              <MdOutlineDoneAll className="icon" />
+      {currentUser ? (
+        <>
+          <Sidebar />
+          <Navbar />
+          <div className="dashboard">
+            <div className="dashboard__card">
+              <div className="cards">
+                <div className="card-icon">
+                  <MdOutlineDoneAll className="icon" />
+                </div>
+                <div>
+                  <p className="card-title">No. Completed Request</p>
+                  <h2 className="total">100k</h2>
+                </div>
+              </div>
+              <div className="cards">
+                <div className="card-icon">
+                  <MdPendingActions className="icon" />
+                </div>
+                <div>
+                  <p className="card-title">No. Pending Request</p>
+                  <h2 className="total">100k</h2>
+                </div>
+              </div>
+              <div className="cards">
+                <div className="card-icon">
+                  <BiSolidUserCheck className="icon" />
+                </div>
+                <div>
+                  <p className="card-title">No. Approved Request</p>
+                  <h2 className="total">100k</h2>
+                </div>
+              </div>
             </div>
-            <div>
-              <p className="card-title">No. Completed Request</p>
-              <h2 className="total">100k</h2>
+            <div className="dashboard-table">
+              <h2 className="table-title">Recent Request</h2>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Request Date</th>
+                    <th>Employee Name</th>
+                    <th>Request For</th>
+                    <th>Position</th>
+                    <th>Status</th>
+                    <th colSpan={2}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {requestData.map((request) => (
+                    <tr key={request.id}>
+                      <td>{toDateTimeString(request.time_out)}</td>
+                      <td>
+                        {request.first_name}{" "}
+                        {request.middle_name?.charAt(0) ?? ""}.{" "}
+                        {request.last_name}
+                      </td>
+                      <td>
+                        {request.request_type === 1
+                          ? "Personal"
+                          : request.request_type === 2
+                          ? "Official"
+                          : "No Request Type"}
+                      </td>
+                      <td>{request.position}</td>
+                      <td>
+                        <p
+                          className={`order_status ${getRequestStatusClass(
+                            request.status
+                          )}`}
+                        >
+                          {getStatus(request.status)}
+                        </p>
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          className="btn btn-primary"
+                          onClick={() => openModal(request.id)}
+                        >
+                          View
+                        </button>
+                      </td>
+                      <td className="set_status">
+                        <BsThreeDots
+                          className="status_icon"
+                          onClick={() => requestStatus(request.id)}
+                        />
+                        {activeOrderId === request.id && (
+                          <div className="select_status">
+                            <button
+                              className="link_status"
+                              onClick={() => handleApproved(request.id)}
+                            >
+                              <BiDislike className="link_icon view_icon" />
+                              Approved
+                            </button>
+                            <button
+                              className="link_status"
+                              onClick={() => handleCancelled(request.id)}
+                            >
+                              <FiXCircle className="link_icon reject_icon" />
+                              Cancel
+                            </button>
+                            <button
+                              className="link_status"
+                              onClick={() => handleDeleted(request.id)}
+                            >
+                              <MdDeleteOutline className="link_icon accept_icon" />
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
-          <div className="cards">
-            <div className="card-icon">
-              <MdPendingActions className="icon" />
-            </div>
-            <div>
-              <p className="card-title">No. Pending Request</p>
-              <h2 className="total">100k</h2>
-            </div>
-          </div>
-          <div className="cards">
-            <div className="card-icon">
-              <BiSolidUserCheck className="icon" />
-            </div>
-            <div>
-              <p className="card-title">No. Approved Request</p>
-              <h2 className="total">100k</h2>
-            </div>
-          </div>
-        </div>
-        <div className="dashboard-table">
-          <h2 className="table-title">Recent Request</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Request Date</th>
-                <th>Employee Name</th>
-                <th>Request For</th>
-                <th>Position</th>
-                <th>Status</th>
-                <th colSpan={2}>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {requestData.map((request) => (
-                <tr key={request.id}>
-                  <td>{toDateTimeString(request.time_out)}</td>
-                  <td>
-                  {request.first_name} {request.middle_name.charAt(0)}. {request.last_name}
-                  </td>
-                  <td>
-                    {request.request_type === 1
-                      ? "Personal"
-                      : request.request_type === 2
-                      ? "Official"
-                      : "No Request Type"}
-                  </td>
-                  <td>{request.position}</td>
-                  <td>
-                    <p
-                      className={`order_status ${getRequestStatusClass(
-                        request.status
-                      )}`}
-                    >
-                      {getStatus(request.status)}
-                    </p>
-                  </td>
-                  <td>
+          {/* Modal */}
+          {requestData.map((request) => (
+            <Modal
+              key={request.id}
+              show={showModalId === request.id}
+              onHide={closeModal}
+              aria-labelledby="exampleModalLabel"
+              backdrop="static"
+              keyboard={false}
+            >
+              <div className="modal-dialog">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h1 className="modal-title fs-5" id="exampleModalLabel">
+                      Permit Slip
+                    </h1>
+                  </div>
+                  <div className="modal-body">
+                    <PassSlipTemp request={request} />
+                  </div>
+                  <div className="modal-footer">
                     <button
                       type="button"
-                      className="btn btn-primary"
-                      onClick={() => openModal(request.id)}
+                      className="btn btn-secondary"
+                      onClick={closeModal}
                     >
-                      View
+                      Close
                     </button>
-                  </td>
-                  <td className="set_status">
-                    <BsThreeDots
-                      className="status_icon"
-                      onClick={() => requestStatus(request.id)}
-                    />
-                    {activeOrderId === request.id && (
-                      <div className="select_status">
-                        <button className="link_status" onClick={() => handleApproved(request.id)}>
-                          <BiDislike className="link_icon view_icon" />
-                          Approved
-                        </button>
-                        <button className="link_status" onClick={() => handleCancelled(request.id)}>
-                          <FiXCircle className="link_icon reject_icon" />
-                          Cancel
-                        </button>
-                        <button className="link_status" onClick={() => handleDeleted(request.id)}>
-                          <MdDeleteOutline className="link_icon accept_icon" />
-                          Delete
-                        </button>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      {/* Modal */}
-      {requestData.map((request) => (
-        <Modal
-          key={request.id}
-          show={showModalId === request.id}
-          onHide={closeModal}
-          aria-labelledby="exampleModalLabel"
-          backdrop="static"
-          keyboard={false}
-        >
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h1 className="modal-title fs-5" id="exampleModalLabel">
-                  Permit Slip
-                </h1>
+                  </div>
+                </div>
               </div>
-              <div className="modal-body">
-                <PassSlipTemp request={request} />
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={closeModal}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </Modal>
-      ))}
+            </Modal>
+          ))}
+        </>
+      ) : (
+        navigate("/login")
+      )}
     </>
   );
 }

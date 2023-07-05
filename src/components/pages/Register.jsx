@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext"
+import { useAuth } from "../../context/AuthContext";
 import "./../style/Login.css";
 import { AiOutlineUser, AiOutlineEyeInvisible } from "react-icons/ai";
 import { FiUnlock, FiEye } from "react-icons/fi";
@@ -21,12 +21,13 @@ const Register = () => {
   const handleSignup = async (event) => {
     event.preventDefault();
     try {
-      await auth.register({ 
+      await auth.register({
         first_name,
         last_name,
         username,
         password,
-        confirm_pass });
+        confirm_pass,
+      });
     } catch (err) {
       // console.log(err.result?.errors?);
       alert(err);
@@ -39,7 +40,7 @@ const Register = () => {
         <div className="login_form">
           <h2>Sign Up</h2>
           <form onSubmit={handleSignup}>
-          <div className="input_group">
+            <div className="input_group">
               <AiOutlineUser className="fa" />
               <input
                 type="first_name"
