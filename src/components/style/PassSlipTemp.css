@@ -1,5 +1,13 @@
-.pass_slip_temp{
-    padding: 20px;
+/* .pass_slip_temp{
+    padding: 10px;
+} */
+
+.title__2, 
+.modal__details, 
+.sir__madam, 
+.title__3, .select
+{
+    line-height: 1;
 }
 
 .modal__details{
@@ -23,7 +31,7 @@
 
 .modal__h5{
     border-bottom: 1px solid black;
-    margin: 0 20px;
+    /* margin: 0 20px; */
     text-align: center;
 }
 

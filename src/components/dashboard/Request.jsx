@@ -59,7 +59,7 @@ function Request() {
     try{
       const {data} = await axios.delete(`http://localhost:3001/request/delete/${id}`)
       alert(data.msg)
-      if(data.success){
+      if(data.succes){
         handleRequestData()
       }
     }
@@ -184,7 +184,7 @@ function Request() {
                 <tr key={request.id}>
                   <td>{toDateTimeString(request.time_out)}</td>
                   <td>
-                    {request.first_name} {request.last_name}
+                  {request.first_name} {request.middle_name.charAt(0)}. {request.last_name}
                   </td>
                   <td>
                     {request.request_type === 1

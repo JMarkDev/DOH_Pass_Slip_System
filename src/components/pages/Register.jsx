@@ -28,8 +28,8 @@ const Register = () => {
         password,
         confirm_pass });
     } catch (err) {
-      console.log(err);
-      alert("Sign up failed. Please try again.");
+      // console.log(err.result?.errors?);
+      alert(err);
     }
   };
 
@@ -56,6 +56,7 @@ const Register = () => {
                 type="last_name"
                 placeholder="Last Name"
                 className="input_text"
+                required
                 autoComplete="off"
                 value={last_name}
                 onChange={(e) => setlastName(e.target.value)}
@@ -67,7 +68,6 @@ const Register = () => {
                 type="text"
                 placeholder="Username"
                 className="input_text"
-                required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />

@@ -1,7 +1,6 @@
 import "../style/PassSlipTemp.css";
 import { useState } from "react";
 
-// eslint-disable-next-line react/prop-types
 function PassSlipTemp({ request }) {
   const [selectedOption, setSelectedOption] = useState(
     request.request_type === 1 ? "Personal" : "Official"
@@ -16,15 +15,29 @@ function PassSlipTemp({ request }) {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
     };
 
     const formattedDate = date.toLocaleString("en-US", options);
 
     return formattedDate;
   };
+
+  const Time = (time) => {
+    if (time === null) {
+      return "PENDING";
+    }
+    const date = new Date(time);
+
+    const options1 = {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    };
+
+    const formattedDate = date.toLocaleString("en-US", options1);
+
+    return formattedDate;
+  }
 
   const handleOptionChange = (id) => {
     setSelectedOption(id);
@@ -42,19 +55,19 @@ function PassSlipTemp({ request }) {
               <label className="modal__label" htmlFor="">
                 No.
               </label>
-              <p>{request.phone_no}</p>
+              <p className="modal__h5">{request.phone_no}</p>
             </div>
             <div className="modal__details">
               <label className="modal__label" htmlFor="">
                 Date:
               </label>
-              <p>{toDateTimeString(request.time_out)}</p>
+              <p className="modal__h5">{toDateTimeString(request.time_out)}</p>
             </div>
             <div className="modal__details">
               <label className="modal__label" htmlFor="">
                 Position:
               </label>
-              <p>{request.position}</p>
+              <p className="modal__h5">{request.position}</p>
             </div>
           </div>
           <p className="sir__madam">Sir/Madam,</p>
@@ -94,14 +107,14 @@ function PassSlipTemp({ request }) {
             </div>
           </div>
           <p className="title__3">(Specify Office/Place to be visited)</p>
-          <p className="title__3">Department of Health Zamboanga Del Sur</p>
+          <p className=" modal__h5">{request.location}</p>
           <div className="modal__time">
-            <label>TIME OUT: {request.timeOut}</label>
-            <p>TIME IN: 12:00:00 AM</p>
+            <p className="modal__h5">TIME OUT: {Time(request.time_out)}</p>
+            <p className="modal__h5">TIME IN: {Time(request.time_in)}</p>
           </div>
           <div>
             <div className="employee">
-              <h5 className="modal__h5">{request.employeeName}</h5>
+              <h5 className="modal__h5">{request.first_name} {request.middle_name.charAt(0)}. {request.last_name}</h5>
               <p className="printed__name">
                 Employee's Printed Name & Signature
               </p>

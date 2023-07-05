@@ -39,7 +39,7 @@ function PassSlip() {
         submitData
       );
       console.log(res.data);
-      if (res.data.succes) {
+      if (res.data.success) {
         socket.emit("send_request", submitData);
       }
       alert(res.data.msg);
@@ -73,7 +73,6 @@ function PassSlip() {
 
   useEffect(() => {
     getDateTimeNow();
-    // setInterval(getDateTimeNow, 100);
   }, []);
 
   const handleOptionChange = (event) => {

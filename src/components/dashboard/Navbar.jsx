@@ -7,7 +7,7 @@ import '../style/Navbar.css';
 const pageTitles = {
   '/dashboard': 'Dashboard',
   '/request': 'Request',
-  '/archive': 'Archive',
+  '/archives': 'Archives',
 };
 
 const monthNames = [
@@ -20,7 +20,7 @@ function Navbar({ showSidebar, handleSidebarToggle }) {
   const pageTitle = pageTitles[location.pathname];
   const [dateNow, setDateNow] = useState('');
 
-  useEffect(() => {
+  // useEffect(() => {
     const updateDateTime = () => {
       const today = new Date();
       const month = monthNames[today.getMonth()];
@@ -40,15 +40,6 @@ function Navbar({ showSidebar, handleSidebarToggle }) {
       const time = getHours();
       setDateNow(date + ' ' + time);
     };
-
-    updateDateTime(); // Call it initially to avoid delay on the first render
-
-    const intervalId = setInterval(updateDateTime, 1000); // Update every second
-
-    return () => {
-      clearInterval(intervalId); // Clean up the interval on component unmount
-    };
-  }, []);
 
   return (
     <div className={`nav__dashboard ${showSidebar ? 'nav__dashboard1' : ''}`}>

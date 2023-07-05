@@ -147,7 +147,7 @@ function Archives() {
                   <td><input type="checkbox" /></td>
                   <td>{toDateTimeString(passlip.time_out)}</td>
                   <td>
-                    {passlip.first_name} {passlip.last_name}
+                  {passlip.first_name} {passlip.middle_name.charAt(0)}. {passlip.last_name}
                   </td>
                   <td>
                     {passlip.request_type === 1

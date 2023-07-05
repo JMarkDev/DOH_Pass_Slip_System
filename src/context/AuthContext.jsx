@@ -66,16 +66,18 @@ function AuthProvider({ children }) {
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
+          console.log(data);
           setUser(data.user);
           navigate("/dashboard");
           alert("Register Successfully");
           console.log("working");
         } else {
-          alert("Error");
-          console.log("error");
+          console.log(data.result?.errors?.first_name?.[0] ?? " ");
+          alert(data.result?.errors?.first_name?.[0] ?? " ");
         }
-      });
+      })
   }
+  
   
 
   const value = {

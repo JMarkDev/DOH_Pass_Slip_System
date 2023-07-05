@@ -17,8 +17,8 @@ function Verifier() {
     try{
       const {data} = await axios.put(`http://localhost:3001/request/update/${COMPLETED_STATUS}/${id}`)
       alert(data.msg)
-      if(data.result){
-        handleRequestData()
+      if(data.success){
+        allApproveSlips();
       }
     }
     catch (e) {
