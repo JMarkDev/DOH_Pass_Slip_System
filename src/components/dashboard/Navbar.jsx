@@ -15,12 +15,12 @@ const monthNames = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
-function Navbar({ showSidebar, handleSidebarToggle }) {
+function Navbar() {
   const location = useLocation();
   const pageTitle = pageTitles[location.pathname];
   const [dateNow, setDateNow] = useState('');
 
-  // useEffect(() => {
+  useEffect(() => {
     const updateDateTime = () => {
       const today = new Date();
       const month = monthNames[today.getMonth()];
@@ -41,10 +41,18 @@ function Navbar({ showSidebar, handleSidebarToggle }) {
       setDateNow(date + ' ' + time);
     };
 
+    updateDateTime(); // Call the updateDateTime function
+    const intervalId = setInterval(updateDateTime, 1000);
+
+    return () => {
+      clearInterval(intervalId); // Clean up the interval on component unmount
+    };
+  }, []);
+
   return (
-    <div className={`nav__dashboard ${showSidebar ? 'nav__dashboard1' : ''}`}>
+    <div className="nav__dashboard 'nav__dashboard1">
       <div className="burger">
-        <RxHamburgerMenu className="burger__icon" onClick={handleSidebarToggle} />
+        <RxHamburgerMenu className="burger__icon"/>
         <h3 className="nav_title">{pageTitle}</h3>
       </div>
       <div className="search">

@@ -6,6 +6,17 @@
     margin: 0 40px;
     background-color: #fff;
   }
+
+  .logout__btn{
+    background-color: transparent;
+    border: none;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .logout__btn:hover{
+    color: #333;
+  }
   
   li{
     list-style: none;
@@ -101,7 +112,7 @@ ul li:last-child {
   }
   
   .links:hover a {
-    color: #fff;
+    color: #333;
   }
   
   a {

@@ -1,24 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext"
 import "./../style/Login.css";
 import { AiOutlineUser, AiOutlineEyeInvisible } from "react-icons/ai";
 import { FiUnlock, FiEye } from "react-icons/fi";
+import UserContext from "../../context/UserContext";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const auth = useAuth();
-
+  // const auth = useAuth();
+  // const { setUser } = useContext(UserContext);
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+  const navigate = useNavigate();
 
   const onHandleLogin = async (event) => {
     event.preventDefault();
     try {
-      await auth.login({ username, password });
+      const { data } = await axios.post("http://localhost:3001/user/login", {
+        username,
+        password,
+      });
+      console.log(data);
+      if(data.success) {
+        localStorage.setItem('user', JSON.stringify(data.result));
+        // setUser(data.result);
+        navigate("/dashboard");
+      }
+      const error = data?.msg ?? "Login Successfully"
+
+      alert(error)
+      
     } catch (err) {
       console.log(err);
       alert("Login failed. Please try again.");

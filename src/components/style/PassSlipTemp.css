@@ -1,6 +1,19 @@
-/* .pass_slip_temp{
-    padding: 10px;
-} */
+@media print {
+    @page {
+      margin: 20px; /* Adjust the margin as per your requirements */
+    }
+  
+    .seroy {
+      width: fit-content;
+    }
+  
+    .page-break {
+      margin-top: 1rem;
+      display: block;
+      page-break-before: auto;
+    }
+  }
+  
 
 .title__2, 
 .modal__details, 

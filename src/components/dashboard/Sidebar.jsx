@@ -5,8 +5,14 @@ import {BsArchive} from "react-icons/bs"
 import {LuLayoutDashboard} from "react-icons/lu"
 import logo from "../../assets/DOH_SEAL_-_FULL_COLOR.png"
 import { FaUsers } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom';
 
 function Sidebar({showSidebar}) {
+    const navigate = useNavigate()
+    const handleLogout = () => {
+        localStorage.removeItem('user');
+        navigate('/login');
+    }
   return (
     <div className={`sidebar ${showSidebar ? "hide__sidebar" : ""}`}>
         <div className="sidebar-context">
@@ -34,10 +40,10 @@ function Sidebar({showSidebar}) {
                         </Link>
                     </li>
                     <li className="links">
-                        <Link to="/login" className="link">
+                        <button className="link logout__btn" onClick={() => handleLogout()}>
                             <BiLogOut className='icons'/>
                             Logout
-                        </Link>
+                        </button>
                     </li>
                 </ul>
 {/* 

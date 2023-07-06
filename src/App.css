@@ -26,6 +26,7 @@
 body{
   background-repeat: no-repeat;
   background-size: cover;
+  background-attachment: fixed;
   background-image: url(./assets/277545788_346462727503794_2429890522423356628_n.jpg);
 }
 

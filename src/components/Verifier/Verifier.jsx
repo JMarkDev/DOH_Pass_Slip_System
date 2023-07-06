@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import "../style/Dashboard.css";
 import { BsThreeDots } from "react-icons/bs";
 import { AiFillPrinter } from "react-icons/ai";
@@ -6,11 +6,47 @@ import { FiCheckCircle } from "react-icons/fi";
 import "../style/Dashboard.css";
 import axios from "axios";
 import io from "socket.io-client";
+import { Modal } from 'react-bootstrap';
+import { useReactToPrint } from 'react-to-print';
+import PassSlipTemp from "../dashboard/PassSlipTemp";
+import { getStatus } from "../dashboard/Dashboard";
+import {getRequestStatusClass} from "../dashboard/Dashboard"
 
 function Verifier() {
   const [activeOrderId, setActiveOrderId] = useState(null);
   const [passlips, setPasslips] = useState([]);
+  const [showModalId, setShowModalId] = useState(null);
   const socket = io.connect("http://localhost:3001");
+
+  const componentRef = useRef();
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
+
+  const openModal = (orderId) => {
+    setShowModalId(orderId);
+  };
+
+  const closeModal = () => {
+    setShowModalId(null);
+  };
+
+  const toDateTimeString = (datetime) => {
+    const date = new Date(datetime);
+
+    const options = {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    };
+
+    const formattedDate = date.toLocaleString("en-US", options);
+
+    return formattedDate;
+  };
 
   const handleCompleted = async (id) => {
     const COMPLETED_STATUS = 4;
@@ -33,6 +69,13 @@ function Verifier() {
     document.body.classList.add("status");
   };
 
+  const compareDateTime = (a, b) => {
+    const dateA = new Date(a.time_out);
+    const dateB = new Date(b.time_out);
+
+    return dateB - dateA;
+  };
+
   const allApproveSlips = async () => {
     const APPROVE = 2;
   
@@ -41,7 +84,9 @@ function Verifier() {
         `http://localhost:3001/request/all/${APPROVE}`
       );
       console.log(data.result); // Check the value here
-      setPasslips(data.result);
+      const tempData = data.result;
+      const sorted = tempData.sort(compareDateTime);
+      setPasslips(sorted);
     } catch (e) {
       console.log(e);
     }
@@ -57,33 +102,6 @@ function Verifier() {
     });
   }, []);
 
-  const getRequestStatusClass = (status) => {
-    console.log(status);
-    if (status === 1) {
-      return "pending";
-    } else if (status === 2) {
-      return "approved";
-    } else if (status === 3) {
-      return "cancelled";
-    } else if (status === 4) {
-      return "completed";
-    }
-
-    return "";
-  };
-  const getStatus = (status) => {
-    if (status === 1) {
-      return "Pending";
-    } else if (status === 2) {
-      return "Approved";
-    } else if (status === 3) {
-      return "Cancelled";
-    } else if (status === 4) {
-      return "Completed";
-    } else {
-      return "";
-    }
-  };
   return (
     <div className="verifier">
       <div className="dashboard-table">
@@ -105,7 +123,7 @@ function Verifier() {
           {passlips.map((passlip) => (
         <tr key={passlip.id}>
         <td>{passlip.id}</td>
-        <td>{passlip.time_out}</td>
+        <td>{toDateTimeString(passlip.time_out)}</td>
         <td>
           {passlip.first_name} {passlip.last_name}
         </td>
@@ -132,9 +150,9 @@ function Verifier() {
               <FiCheckCircle className="link_icon accept_icon" />
               Completed
             </button>
-            <button className="link_status">
+            <button className="link_status" onClick={() => openModal(passlip.id)}>
               <AiFillPrinter className="link_icon view_icon" />
-              Print
+              Print/View
             </button>
           </div>
         )}
@@ -143,6 +161,39 @@ function Verifier() {
   ))}
           </tbody>
         </table>
+        {passlips.map((request) => (
+        <Modal
+          key={request.id}
+          show={showModalId === request.id}
+          onHide={closeModal}
+          aria-labelledby="exampleModalLabel"
+          backdrop="static"
+          keyboard={false}
+        >
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h1 className="modal-title fs-5" id="exampleModalLabel">
+                  Permit Slip
+                </h1>
+              </div>
+              <div className="modal-body" ref={componentRef}>
+                <PassSlipTemp request={request} />
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={closeModal}
+                >
+                  Close
+                </button>
+                <button type="button" className="btn btn-primary" onClick={handlePrint}>Print</button>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      ))}
       </div>
     </div>
   );

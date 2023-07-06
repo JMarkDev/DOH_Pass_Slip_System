@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Modal } from "react-bootstrap";
 import "../style/Dashboard.css";
 import {
@@ -14,19 +14,105 @@ import Navbar from "../dashboard/Navbar";
 import PassSlipTemp from "./PassSlipTemp";
 import axios from "axios";
 import io from "socket.io-client";
+// import UserContext from "../../context/UserContext";
+import { useNavigate } from "react-router-dom";
+
+export  const getRequestStatusClass = (status) => {
+  if (status === 1) {
+    return "pending";
+  } else if (status === 2) {
+    return "approved";
+  } else if (status === 3) {
+    return "cancelled";
+  } else if (status === 4) {
+    return "completed";
+  }
+
+  return "";
+};
+
+export const getStatus = (status) => {
+  if (status === 1) {
+    return "Pending";
+  } else if (status === 2) {
+    return "Approved";
+  } else if (status === 3) {
+    return "Cancelled";
+  } else if (status === 4) {
+    return "Completed";
+  } else {
+    return "";
+  }
+};
 
 function Dashboard() {
   const [activeOrderId, setActiveOrderId] = useState(null);
   const [showModalId, setShowModalId] = useState(null);
   const [requestData, setRequestData] = useState([]);
+  const [requestData1, setRequestData1] = useState([]);
+  const [user, setUser] = useState(null)
   const socket = io.connect("http://localhost:3001");
+  const [completedCount, setCompletedCount] = useState(0);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [approvedCount, setApprovedCount] = useState(0);
 
+  useEffect(() => {
+    requestData1.map((status) => {
+      if (status.status === 1) {
+        setPendingCount((prevCount) => prevCount + 1);
+      } else if (status.status === 2) {
+        setApprovedCount((prevCount) => prevCount + 1);
+      } else if (status.status === 4) {
+        setCompletedCount((prevCount) => prevCount + 1);
+      }
+      return status;
+    });
+  }, [requestData1]);
+  
+  const handleRequestData1 = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/request");
+      const data = response.data;
+  
+      setRequestData1(data.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  
+  useEffect(() => {
+    handleRequestData1();
+  
+    socket.on("receive_request", (data) => {
+      handleRequestData();
+    });
+  }, []);
+  
   const requestStatus = (orderId) => {
-    setActiveOrderId((prevOrderId) =>
-      prevOrderId === orderId ? null : orderId
-    );
+    setActiveOrderId((prevOrderId) => (prevOrderId === orderId ? null : orderId));
     document.body.classList.add("status");
   };
+  
+  useEffect(() => {
+    let pendingCount = 0;
+    let approvedCount = 0;
+    let completedCount = 0;
+  
+    requestData1.forEach((status) => {
+      if (status.status === 1) {
+        pendingCount++;
+      } else if (status.status === 2) {
+        approvedCount++;
+      } else if (status.status === 4) {
+        completedCount++;
+      }
+    });
+  
+    setPendingCount(pendingCount);
+    setApprovedCount(approvedCount);
+    setCompletedCount(completedCount);
+  }, [requestData1]);  
+  
 
   const handleApproved = async (id) => {
     const APPROVED_STATUS = 2
@@ -80,34 +166,6 @@ function Dashboard() {
     setShowModalId(null);
   };
 
-  const getRequestStatusClass = (status) => {
-    if (status === 1) {
-      return "pending";
-    } else if (status === 2) {
-      return "approved";
-    } else if (status === 3) {
-      return "cancelled";
-    } else if (status === 4) {
-      return "completed";
-    }
-
-    return "";
-  };
-
-  const getStatus = (status) => {
-    if (status === 1) {
-      return "Pending";
-    } else if (status === 2) {
-      return "Approved";
-    } else if (status === 3) {
-      return "Cancelled";
-    } else if (status === 4) {
-      return "Completed";
-    } else {
-      return "";
-    }
-  };
-
   const toDateTimeString = (datetime) => {
     const date = new Date(datetime);
 
@@ -131,7 +189,6 @@ function Dashboard() {
 
     return dateB - dateA;
   };
-
   const handleRequestData = async () => {
     const Pending = 1;
     try {
@@ -146,15 +203,23 @@ function Dashboard() {
 
   useEffect(() => {
     handleRequestData();
-
+    const savedUser = JSON.parse(localStorage.getItem("user"))
+    if (savedUser) {
+      setUser(savedUser)
+      // setLoading(true)
+    }
+    else {
+      navigate('/login')
+    }
     socket.on("receive_request", (data) => {
       handleRequestData();
     });
   }, []);
 
   return (
-    <>
-      <Sidebar />
+    // <> {!loading ? <h1>Loading...</h1> : (
+      <div>
+        <Sidebar />
       <Navbar />
       <div className="dashboard">
         <div className="dashboard__card">
@@ -164,7 +229,7 @@ function Dashboard() {
             </div>
             <div>
               <p className="card-title">No. Completed Request</p>
-              <h2 className="total">100k</h2>
+              <h2 className="total">{completedCount}</h2>
             </div>
           </div>
           <div className="cards">
@@ -173,7 +238,7 @@ function Dashboard() {
             </div>
             <div>
               <p className="card-title">No. Pending Request</p>
-              <h2 className="total">100k</h2>
+              <h2 className="total">{pendingCount}</h2>
             </div>
           </div>
           <div className="cards">
@@ -182,7 +247,7 @@ function Dashboard() {
             </div>
             <div>
               <p className="card-title">No. Approved Request</p>
-              <h2 className="total">100k</h2>
+              <h2 className="total">{approvedCount}</h2>
             </div>
           </div>
         </div>
@@ -260,7 +325,6 @@ function Dashboard() {
           </table>
         </div>
       </div>
-      {/* Modal */}
       {requestData.map((request) => (
         <Modal
           key={request.id}
@@ -293,7 +357,10 @@ function Dashboard() {
           </div>
         </Modal>
       ))}
-    </>
+      </div>
+    // ) }
+      
+    // </>
   );
 }
 

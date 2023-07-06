@@ -45,7 +45,7 @@ function PassSlipTemp({ request }) {
 
   return (
     <>
-      <div className="pass_slip_temp">
+      <div className="pass_slip_temp seroy">
         <div>
           <p className="title__2">
             (To be prepared In duplicate Org. SG Dup. HRMP)
@@ -110,7 +110,7 @@ function PassSlipTemp({ request }) {
           <p className=" modal__h5">{request.location}</p>
           <div className="modal__time">
             <p className="modal__h5">TIME OUT: {Time(request.time_out)}</p>
-            <p className="modal__h5">TIME IN: {Time(request.time_in)}</p>
+            <p className="modal__h5">TIME IN: {request.status === 2 ? "PENDING" : Time(request.time_in)}</p>
           </div>
           <div>
             <div className="employee">

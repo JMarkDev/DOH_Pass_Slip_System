@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext"
+// import { useAuth } from "../../context/AuthContext"
 import "./../style/Login.css";
 import { AiOutlineUser, AiOutlineEyeInvisible } from "react-icons/ai";
 import { FiUnlock, FiEye } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Register = () => {
-  const auth = useAuth();
-  const [username, setUsername] = useState("");
+  // const auth = useAuth();
   const [first_name, setfirstName] = useState("");
   const [last_name, setlastName] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirm_pass, setconfirm_password] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -18,18 +20,30 @@ const Register = () => {
     setShowPassword(!showPassword);
   };
 
+  const navigate = useNavigate();
+
   const handleSignup = async (event) => {
     event.preventDefault();
     try {
-      await auth.register({ 
-        first_name,
+      const { data } = await axios.post("http://localhost:3001/user/register", {
+        first_name, 
         last_name,
         username,
         password,
-        confirm_pass });
+        confirm_pass
+      });
+      console.log(data);
+      if(data.success) {
+        localStorage.setItem('user', JSON.stringify(data.result));
+        navigate("/login");
+      }
+      const error = data?.msg ?? "Registered Successfully"
+
+      alert(error)
+      
     } catch (err) {
-      // console.log(err.result?.errors?);
-      alert(err);
+      console.log(err);
+      alert("Register failed. Please try again.");
     }
   };
 
@@ -37,7 +51,7 @@ const Register = () => {
     <div className="signup">
       <div className="login_form_container signup_form_container">
         <div className="login_form">
-          <h2>Sign Up</h2>
+          <h2>Register</h2>
           <form onSubmit={handleSignup}>
           <div className="input_group">
               <AiOutlineUser className="fa" />

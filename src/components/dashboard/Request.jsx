@@ -11,6 +11,8 @@ import { AiOutlineSearch } from "react-icons/ai";
 import "../style/Request.css";
 import axios from "axios";
 import io from "socket.io-client";
+import { getRequestStatusClass } from "./Dashboard";
+import { getStatus } from "./Dashboard";
 
 function Request() {
   const [activeOrderId, setActiveOrderId] = useState(null);
@@ -74,34 +76,6 @@ function Request() {
 
   const closeModal = () => {
     setShowModalId(null);
-  };
-
-  const getRequestStatusClass = (status) => {
-    if (status === 1) {
-      return "pending";
-    } else if (status === 2) {
-      return "approved";
-    } else if (status === 3) {
-      return "cancelled";
-    } else if (status === 4) {
-      return "completed";
-    }
-
-    return "";
-  };
-
-  const getStatus = (status) => {
-    if (status === 1) {
-      return "Pending";
-    } else if (status === 2) {
-      return "Approved";
-    } else if (status === 3) {
-      return "Cancelled";
-    } else if (status === 4) {
-      return "Completed";
-    } else {
-      return "";
-    }
   };
 
   const toDateTimeString = (datetime) => {
