@@ -7,6 +7,9 @@ import "../style/Archive.css"
 import axios from "axios";
 import io from "socket.io-client";
 import { useReactToPrint } from 'react-to-print';
+import { toDateTimeString } from './DashboardTable';
+import { getRequestStatusClass } from './DashboardTable';
+import { getStatus } from './DashboardTable';
 
 function Archives() {
   const [activeOrderId, setActiveOrderId] = useState(null);
@@ -57,51 +60,6 @@ function Archives() {
 
   const closeModal = () => {
     setShowModalId(null);
-  };
-
-  const getRequestStatusClass = (status) => {
-    if (status === 1) {
-      return "pending";
-    } else if (status === 2) {
-      return "approved";
-    } else if (status === 3) {
-      return "cancelled";
-    } else if (status === 4) {
-      return "completed";
-    }
-
-    return "";
-  };
-
-  const getStatus = (status) => {
-    if (status === 1) {
-      return "Pending";
-    } else if (status === 2) {
-      return "Approved";
-    } else if (status === 3) {
-      return "Cancelled";
-    } else if (status === 4) {
-      return "Completed";
-    } else {
-      return "";
-    }
-  };
-
-  const toDateTimeString = (datetime) => {
-    const date = new Date(datetime);
-
-    const options = {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    };
-
-    const formattedDate = date.toLocaleString("en-US", options);
-
-    return formattedDate;
   };
 
   const compareDateTime = (a, b) => {

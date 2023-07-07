@@ -1,106 +1,163 @@
-import { useEffect, useState } from "react";
-import Sidebar from "./Sidebar";
-import Navbar from "./Navbar";
-import PassSlipTemp from "./PassSlipTemp";
+import { useEffect, useState} from "react";
 import { Modal } from "react-bootstrap";
-import { MdDeleteOutline } from "react-icons/md";
+import "../style/Dashboard.css";
+import {MdDeleteOutline} from "react-icons/md";
 import { BsThreeDots } from "react-icons/bs";
-import { BiDislike } from "react-icons/bi";
+import { BiDislike} from "react-icons/bi";
 import { FiXCircle } from "react-icons/fi";
-import { AiOutlineSearch } from "react-icons/ai";
-import "../style/Request.css";
 import axios from "axios";
 import io from "socket.io-client";
-import { getRequestStatusClass } from "./DashboardTable";
-import { getStatus } from "./DashboardTable";
-import { toDateTimeString } from "./DashboardTable";
-import {handleCancelled} from "./DashboardTable";
-import {handleApproved} from "./DashboardTable";
-import { handleDeleted } from "./DashboardTable";
-function Request() {
-  const [activeOrderId, setActiveOrderId] = useState(null);
-  const [showModalId, setShowModalId] = useState(null);
-  const [requestData, setRequestData] = useState([]);
-  const socket = io.connect("http://localhost:3001");
-  // const [searchTerm, setSearchTerm] = useState("");
+import PassSlipTemp from "./PassSlipTemp";
+import { useNavigate } from "react-router-dom";
 
-
-//  const searchRequest = requestData.filter((request) => {
-//   if (searchTerm === "") {
-//     return request;
-//   } 
-//   if (request.first_name.toLowerCase().includes(searchTerm.toLowerCase())) {
-//     return request;
-//   } else {
-//     return false;
-//   }
-// });
-
+export  const toDateTimeString = (datetime) => {
+    const date = new Date(datetime);
   
+    const options = {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    };
   
-
-  const requestStatus = (orderId) => {
-    setActiveOrderId((prevOrderId) =>
-      prevOrderId === orderId ? null : orderId
-    );
-    document.body.classList.add("status");
+    const formattedDate = date.toLocaleString("en-US", options);
+  
+    return formattedDate;
   };
-
-  const openModal = (orderId) => {
-    setShowModalId(orderId);
+  
+  export  const getRequestStatusClass = (status) => {
+    if (status === 1) {
+      return "pending";
+    } else if (status === 2) {
+      return "approved";
+    } else if (status === 3) {
+      return "cancelled";
+    } else if (status === 4) {
+      return "completed";
+    }
+  
+    return "";
   };
-
-  const closeModal = () => {
-    setShowModalId(null);
-  };
-
-  const compareDateTime = (a, b) => {
-    const dateA = new Date(a.time_out);
-    const dateB = new Date(b.time_out);
-
-    return dateB - dateA;
-  };
-
-  const handleRequestData = async () => {
-    try {
-      let { data } = await axios.get("http://localhost:3001/request");
-      const tempData = data.data;
-      const sorted = tempData.sort(compareDateTime);
-      setRequestData(sorted);
-    } catch (e) {
-      console.log(e);
+  
+  export const getStatus = (status) => {
+    if (status === 1) {
+      return "Pending";
+    } else if (status === 2) {
+      return "Approved";
+    } else if (status === 3) {
+      return "Cancelled";
+    } else if (status === 4) {
+      return "Completed";
+    } else {
+      return "";
     }
   };
 
-  useEffect(() => {
-    handleRequestData();
+export  const handleApproved = async (id) => {
+    const APPROVED_STATUS = 2
 
-    socket.on("receive_request", (data) => {
-      handleRequestData();
-    });
-  }, []);
+    try {
+      const {data} = await axios.put(`http://localhost:3001/request/update/${APPROVED_STATUS}/${id}`)
+      alert(data.msg)
+      if(data.success){
+        handleRequestData()
+        socket.emit("send_aprrove", { success: true });
+      }
 
+    }catch (e) {
+      console.log(e)
+    }
+  }
+
+export  const handleCancelled = async (id) => { 
+    const CANCELLED_STATUS = 3;
+
+    try{
+      const {data} = await axios.put(`http://localhost:3001/request/update/${CANCELLED_STATUS}/${id}`)
+      alert(data.msg)
+      if(data.success){
+        handleRequestData()
+      }
+    }
+    catch(e) {
+      console.log(e)
+    }
+  }
+
+export  const handleDeleted = async (id) => {
+    try{
+      const {data} = await axios.delete(`http://localhost:3001/request/delete/${id}`)
+      alert(data.msg)
+      if(data.succes){
+        handleRequestData()
+      }
+    }
+    catch (e){
+      console.log(e)
+    }
+  }
+
+function DashboardTable() {
+    const [activeOrderId, setActiveOrderId] = useState(null);
+    const [showModalId, setShowModalId] = useState(null);
+    const [requestData, setRequestData] = useState([]);
+    const [user, setUser] = useState(null)
+    const socket = io.connect("http://localhost:3001");
+
+    const navigate = useNavigate()
+
+    const requestStatus = (orderId) => {
+        setActiveOrderId((prevOrderId) => (prevOrderId === orderId ? null : orderId));
+        document.body.classList.add("status");
+      };
+    
+      const openModal = (orderId) => {
+        setShowModalId(orderId);
+      };
+    
+      const closeModal = () => {
+        setShowModalId(null);
+      };
+    
+      const compareDateTime = (a, b) => {
+        const dateA = new Date(a.time_out);
+        const dateB = new Date(b.time_out);
+    
+        return dateB - dateA;
+      };
+
+      const handleRequestData = async () => {
+        const Pending = 1;
+        try {
+          let { data } = await axios.get(`http://localhost:3001/request/all/${Pending}`);
+          const tempData = data.result;
+          const sorted = tempData.sort(compareDateTime);
+          setRequestData(sorted);
+        } catch (e) {
+          console.log(e);
+        }
+      };
+    
+      useEffect(() => {
+        handleRequestData();
+        const savedUser = JSON.parse(localStorage.getItem("user"))
+        if (savedUser) {
+          setUser(savedUser)
+        }
+        else {
+          navigate('/login')
+        }
+        socket.on("receive_request", (data) => {
+          handleRequestData();
+        });
+      }, []);
+    
   return (
     <>
-      <Sidebar />
-      <Navbar />
-      <div className="request">
         <div className="dashboard-table">
-          <div className="top__request">
-            <h2 className="table-title">All Request</h2>
-            <div className="search">
-              <input
-                className="search__input"
-                type="text"
-                placeholder="search..."
-                // value={searchTerm}
-                // onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <span className="nav__icon search__icon">
-                <AiOutlineSearch />
-              </span>
-            </div>
-          </div>
+          <h2 className="table-title">Recent Request</h2>
           <table>
             <thead>
               <tr>
@@ -172,8 +229,6 @@ function Request() {
             </tbody>
           </table>
         </div>
-      </div>
-      {/* Modal */}
       {requestData.map((request) => (
         <Modal
           key={request.id}
@@ -207,7 +262,7 @@ function Request() {
         </Modal>
       ))}
     </>
-  );
+  )
 }
 
-export default Request;
+export default DashboardTable

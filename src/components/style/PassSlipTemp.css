@@ -1,6 +1,6 @@
 @media print {
     @page {
-      margin: 20px; /* Adjust the margin as per your requirements */
+      margin: 10px; 
     }
   
     .seroy {
@@ -8,7 +8,7 @@
     }
   
     .page-break {
-      margin-top: 1rem;
+      margin-top: 0.5rem;
       display: block;
       page-break-before: auto;
     }

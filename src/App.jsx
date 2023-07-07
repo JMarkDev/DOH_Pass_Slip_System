@@ -11,6 +11,7 @@ import Login from "./components/pages/Login";
 import UserContext from "./context/UserContext";
 import { useState, useContext, useEffect } from "react";
 import UserProvider from "./context/UserProvider";
+import DashboardTable from "./components/dashboard/DashboardTable";
 function App() {
   const user = useState(null);
 
@@ -27,6 +28,7 @@ function App() {
           <Route path="/verifier" element={<Verifier />} />
           <Route path="/archives" element={<Archives />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/table" element={<DashboardTable />} />
         </Routes>
       </UserProvider>
     </>

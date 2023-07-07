@@ -9,8 +9,8 @@ import io from "socket.io-client";
 import { Modal } from 'react-bootstrap';
 import { useReactToPrint } from 'react-to-print';
 import PassSlipTemp from "../dashboard/PassSlipTemp";
-import { getStatus } from "../dashboard/Dashboard";
-import {getRequestStatusClass} from "../dashboard/Dashboard"
+import { getStatus } from "../dashboard/DashboardTable";
+import {getRequestStatusClass} from "../dashboard/DashboardTable"
 
 function Verifier() {
   const [activeOrderId, setActiveOrderId] = useState(null);
