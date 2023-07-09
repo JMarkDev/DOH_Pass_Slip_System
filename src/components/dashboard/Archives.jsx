@@ -1,4 +1,5 @@
 import { useState,useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar'
 import Navbar from './Navbar'
 import PassSlipTemp from './PassSlipTemp';
@@ -7,16 +8,21 @@ import "../style/Archive.css"
 import axios from "axios";
 import io from "socket.io-client";
 import { useReactToPrint } from 'react-to-print';
-import { toDateTimeString } from './DashboardTable';
-import { getRequestStatusClass } from './DashboardTable';
-import { getStatus } from './DashboardTable';
+import { 
+  toDateTimeString,
+  getRequestStatusClass,
+  getStatus,
+  compareDateTime
+} from './DashboardTable';
 
 function Archives() {
   const [activeOrderId, setActiveOrderId] = useState(null);
+  const [user, setUser] = useState(null);
   const [showModalId, setShowModalId] = useState(null);
   const [requestData, setRequestData] = useState([]);
   const [passlips, setPasslips] = useState([]);
   const socket = io.connect("http://localhost:3001");
+  const navigate = useNavigate();
 
   const componentRef = useRef();
   const handlePrint = useReactToPrint({
@@ -62,13 +68,6 @@ function Archives() {
     setShowModalId(null);
   };
 
-  const compareDateTime = (a, b) => {
-    const dateA = new Date(a.time_out);
-    const dateB = new Date(b.time_out);
-
-    return dateB - dateA;
-  };
-
   const handleRequestData = async () => {
     try {
       let { data } = await axios.get("http://localhost:3001/request");
@@ -82,7 +81,13 @@ function Archives() {
 
   useEffect(() => {
     handleRequestData();
-
+    const savedUser = JSON.parse(localStorage.getItem("user"))
+    if (savedUser) {
+      setUser(savedUser)
+    }
+    else {
+      navigate('/login')
+    }
     socket.on("receive_request", (data) => {
       handleRequestData();
     });

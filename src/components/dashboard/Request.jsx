@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 import PassSlipTemp from "./PassSlipTemp";
@@ -14,30 +15,15 @@ import io from "socket.io-client";
 import { getRequestStatusClass } from "./DashboardTable";
 import { getStatus } from "./DashboardTable";
 import { toDateTimeString } from "./DashboardTable";
-import {handleCancelled} from "./DashboardTable";
-import {handleApproved} from "./DashboardTable";
-import { handleDeleted } from "./DashboardTable";
+
 function Request() {
   const [activeOrderId, setActiveOrderId] = useState(null);
   const [showModalId, setShowModalId] = useState(null);
   const [requestData, setRequestData] = useState([]);
   const socket = io.connect("http://localhost:3001");
-  // const [searchTerm, setSearchTerm] = useState("");
-
-
-//  const searchRequest = requestData.filter((request) => {
-//   if (searchTerm === "") {
-//     return request;
-//   } 
-//   if (request.first_name.toLowerCase().includes(searchTerm.toLowerCase())) {
-//     return request;
-//   } else {
-//     return false;
-//   }
-// });
-
-  
-  
+  const [user, setUser] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   const requestStatus = (orderId) => {
     setActiveOrderId((prevOrderId) =>
@@ -74,11 +60,76 @@ function Request() {
 
   useEffect(() => {
     handleRequestData();
-
+    const savedUser = JSON.parse(localStorage.getItem("user"))
+    if (savedUser) {
+      setUser(savedUser)
+    }
+    else {
+      navigate('/login')
+    }
     socket.on("receive_request", (data) => {
       handleRequestData();
     });
   }, []);
+
+  const handleApproved = async (id) => {
+    const APPROVED_STATUS = 2
+
+    try {
+      const {data} = await axios.put(`http://localhost:3001/request/update/${APPROVED_STATUS}/${id}`)
+      alert(data.msg)
+      if(data.success){
+        handleRequestData()
+        socket.emit("send_aprrove", { success: true });
+      }
+
+    }catch (e) {
+      console.log(e)
+    }
+  }
+
+const handleCancelled = async (id) => { 
+    const CANCELLED_STATUS = 3;
+
+    try{
+      const {data} = await axios.put(`http://localhost:3001/request/update/${CANCELLED_STATUS}/${id}`)
+      alert(data.msg)
+      if(data.success){
+        handleRequestData()
+      }
+    }
+    catch(e) {
+      console.log(e)
+    }
+  }
+
+const handleDeleted = async (id) => {
+    try{
+      const {data} = await axios.delete(`http://localhost:3001/request/delete/${id}`)
+      alert(data.msg)
+      if(data.succes){
+        handleRequestData()
+      }
+    }
+    catch (e){
+      console.log(e)
+    }
+  }
+
+  
+ const searchRequest = requestData.filter((request) => {
+  if (searchTerm === "") {
+    return request;
+  } 
+  if (request.first_name.toLowerCase().includes(searchTerm.toLowerCase()) 
+  || request.last_name.toLowerCase().includes(searchTerm.toLowerCase())
+  || request.middle_name.toLowerCase().includes(searchTerm.toLowerCase())
+  ){
+    return request;
+  } else {
+    return false;
+  }
+});
 
   return (
     <>
@@ -93,8 +144,8 @@ function Request() {
                 className="search__input"
                 type="text"
                 placeholder="search..."
-                // value={searchTerm}
-                // onChange={(e) => setSearchTerm(e.target.value)}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
               <span className="nav__icon search__icon">
                 <AiOutlineSearch />
@@ -113,7 +164,7 @@ function Request() {
               </tr>
             </thead>
             <tbody>
-              {requestData.map((request) => (
+              {searchRequest.map((request) => (
                 <tr key={request.id}>
                   <td>{toDateTimeString(request.time_out)}</td>
                   <td>

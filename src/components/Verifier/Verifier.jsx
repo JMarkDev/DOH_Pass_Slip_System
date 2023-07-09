@@ -9,8 +9,7 @@ import io from "socket.io-client";
 import { Modal } from 'react-bootstrap';
 import { useReactToPrint } from 'react-to-print';
 import PassSlipTemp from "../dashboard/PassSlipTemp";
-import { getStatus } from "../dashboard/DashboardTable";
-import {getRequestStatusClass} from "../dashboard/DashboardTable"
+import { getStatus, getRequestStatusClass, toDateTimeString } from "../dashboard/DashboardTable";
 
 function Verifier() {
   const [activeOrderId, setActiveOrderId] = useState(null);
@@ -29,23 +28,6 @@ function Verifier() {
 
   const closeModal = () => {
     setShowModalId(null);
-  };
-
-  const toDateTimeString = (datetime) => {
-    const date = new Date(datetime);
-
-    const options = {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    };
-
-    const formattedDate = date.toLocaleString("en-US", options);
-
-    return formattedDate;
   };
 
   const handleCompleted = async (id) => {
@@ -83,7 +65,6 @@ function Verifier() {
       const { data } = await axios.get(
         `http://localhost:3001/request/all/${APPROVE}`
       );
-      console.log(data.result); // Check the value here
       const tempData = data.result;
       const sorted = tempData.sort(compareDateTime);
       setPasslips(sorted);
@@ -125,7 +106,7 @@ function Verifier() {
         <td>{passlip.id}</td>
         <td>{toDateTimeString(passlip.time_out)}</td>
         <td>
-          {passlip.first_name} {passlip.last_name}
+          {passlip.first_name} {passlip.middle_name.charAt(0) + '.'} {passlip.last_name}
         </td>
         <td>{passlip.request_type === 1 ? "Personal" : "Official"}</td>
         <td>{passlip.position}</td>

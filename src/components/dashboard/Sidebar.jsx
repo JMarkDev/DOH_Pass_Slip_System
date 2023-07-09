@@ -3,7 +3,7 @@ import "../style/Sidebar.css"
 import { BiLogOut} from "react-icons/bi";
 import {BsArchive} from "react-icons/bs"
 import {LuLayoutDashboard} from "react-icons/lu"
-import logo from "../../assets/DOH_SEAL_-_FULL_COLOR.png"
+import logo from "../../assets/images/DOH_SEAL_-_FULL_COLOR.png"
 import { FaUsers } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 

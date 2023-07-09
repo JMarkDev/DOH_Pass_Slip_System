@@ -1,5 +1,5 @@
 import React from 'react'
-import errorImg from "../../assets/404-error.jpg"
+import errorImg from "../../assets/images/404-error.jpg"
 
 function Pagenotfound() {
   return (

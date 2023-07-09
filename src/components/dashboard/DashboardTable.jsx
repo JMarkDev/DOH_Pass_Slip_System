@@ -10,7 +10,14 @@ import io from "socket.io-client";
 import PassSlipTemp from "./PassSlipTemp";
 import { useNavigate } from "react-router-dom";
 
-export  const toDateTimeString = (datetime) => {
+const compareDateTime = (a, b) => {
+  const dateA = new Date(a.time_out);
+  const dateB = new Date(b.time_out);
+
+  return dateB - dateA;
+};
+
+const toDateTimeString = (datetime) => {
     const date = new Date(datetime);
   
     const options = {
@@ -27,7 +34,7 @@ export  const toDateTimeString = (datetime) => {
     return formattedDate;
   };
   
-  export  const getRequestStatusClass = (status) => {
+const getRequestStatusClass = (status) => {
     if (status === 1) {
       return "pending";
     } else if (status === 2) {
@@ -41,7 +48,7 @@ export  const toDateTimeString = (datetime) => {
     return "";
   };
   
-  export const getStatus = (status) => {
+const getStatus = (status) => {
     if (status === 1) {
       return "Pending";
     } else if (status === 2) {
@@ -54,51 +61,7 @@ export  const toDateTimeString = (datetime) => {
       return "";
     }
   };
-
-export  const handleApproved = async (id) => {
-    const APPROVED_STATUS = 2
-
-    try {
-      const {data} = await axios.put(`http://localhost:3001/request/update/${APPROVED_STATUS}/${id}`)
-      alert(data.msg)
-      if(data.success){
-        handleRequestData()
-        socket.emit("send_aprrove", { success: true });
-      }
-
-    }catch (e) {
-      console.log(e)
-    }
-  }
-
-export  const handleCancelled = async (id) => { 
-    const CANCELLED_STATUS = 3;
-
-    try{
-      const {data} = await axios.put(`http://localhost:3001/request/update/${CANCELLED_STATUS}/${id}`)
-      alert(data.msg)
-      if(data.success){
-        handleRequestData()
-      }
-    }
-    catch(e) {
-      console.log(e)
-    }
-  }
-
-export  const handleDeleted = async (id) => {
-    try{
-      const {data} = await axios.delete(`http://localhost:3001/request/delete/${id}`)
-      alert(data.msg)
-      if(data.succes){
-        handleRequestData()
-      }
-    }
-    catch (e){
-      console.log(e)
-    }
-  }
-
+  
 function DashboardTable() {
     const [activeOrderId, setActiveOrderId] = useState(null);
     const [showModalId, setShowModalId] = useState(null);
@@ -119,13 +82,6 @@ function DashboardTable() {
     
       const closeModal = () => {
         setShowModalId(null);
-      };
-    
-      const compareDateTime = (a, b) => {
-        const dateA = new Date(a.time_out);
-        const dateB = new Date(b.time_out);
-    
-        return dateB - dateA;
       };
 
       const handleRequestData = async () => {
@@ -153,6 +109,50 @@ function DashboardTable() {
           handleRequestData();
         });
       }, []);
+    
+     const handleApproved = async (id) => {
+        const APPROVED_STATUS = 2
+    
+        try {
+          const {data} = await axios.put(`http://localhost:3001/request/update/${APPROVED_STATUS}/${id}`)
+          alert(data.msg)
+          if(data.success){
+            handleRequestData()
+            socket.emit("send_aprrove", { success: true });
+          }
+    
+        }catch (e) {
+          console.log(e)
+        }
+      }
+    
+    const handleCancelled = async (id) => { 
+        const CANCELLED_STATUS = 3;
+    
+        try{
+          const {data} = await axios.put(`http://localhost:3001/request/update/${CANCELLED_STATUS}/${id}`)
+          alert(data.msg)
+          if(data.success){
+            handleRequestData()
+          }
+        }
+        catch(e) {
+          console.log(e)
+        }
+      }
+    
+    const handleDeleted = async (id) => {
+        try{
+          const {data} = await axios.delete(`http://localhost:3001/request/delete/${id}`)
+          alert(data.msg)
+          if(data.succes){
+            handleRequestData()
+          }
+        }
+        catch (e){
+          console.log(e)
+        }
+      }
     
   return (
     <>
@@ -266,3 +266,9 @@ function DashboardTable() {
 }
 
 export default DashboardTable
+export {
+  compareDateTime,
+  toDateTimeString,
+  getRequestStatusClass, 
+  getStatus
+}

@@ -10,16 +10,45 @@ import Navbar from "../dashboard/Navbar";
 import axios from "axios";
 import io from "socket.io-client";
 import DashboardTable from "./DashboardTable";
+import { compareDateTime } from "./DashboardTable";
 
 function Dashboard() {
-  const [requestData1, setRequestAllData] = useState([]);
+  const [requestAllData, setRequestAllData] = useState([]);
   const socket = io.connect("http://localhost:3001");
+  const [requestData, setRequestData] = useState([]);
+  const [user, setUser] = useState(null)
   const [completedCount, setCompletedCount] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
   const [approvedCount, setApprovedCount] = useState(0);
 
+  const handleRequestData = async () => {
+    const Pending = 1;
+    try {
+      let { data } = await axios.get(`http://localhost:3001/request/all/${Pending}`);
+      const tempData = data.result;
+      const sorted = tempData.sort(compareDateTime);
+      setRequestData(sorted);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
-    requestData1.map((status) => {
+    handleRequestData();
+    const savedUser = JSON.parse(localStorage.getItem("user"))
+    if (savedUser) {
+      setUser(savedUser)
+    }
+    else {
+      navigate('/login')
+    }
+    socket.on("receive_request", (data) => {
+      handleRequestData();
+    });
+  }, []);
+
+  useEffect(() => {
+    requestAllData.map((status) => {
       if (status.status === 1) {
         setPendingCount((prevCount) => prevCount + 1);
       } else if (status.status === 2) {
@@ -29,7 +58,7 @@ function Dashboard() {
       }
       return status;
     });
-  }, [requestData1]);
+  }, [requestAllData]);
   
   const handleRequestAllData = async () => {
     try {
@@ -55,7 +84,7 @@ function Dashboard() {
     let approvedCount = 0;
     let completedCount = 0;
   
-    requestData1.forEach((status) => {
+    requestAllData.map((status) => {
       if (status.status === 1) {
         pendingCount++;
       } else if (status.status === 2) {
@@ -68,7 +97,8 @@ function Dashboard() {
     setPendingCount(pendingCount);
     setApprovedCount(approvedCount);
     setCompletedCount(completedCount);
-  }, [requestData1]);  
+  }, [requestAllData]);  
+  
 
   return (
       <div>
@@ -104,7 +134,7 @@ function Dashboard() {
             </div>
           </div>
         </div>
-        <DashboardTable />
+        <DashboardTable requestData={requestData}/>
       </div>
       </div>
   );
