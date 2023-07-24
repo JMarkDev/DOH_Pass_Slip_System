@@ -1,5 +1,6 @@
 import "../style/PassSlipTemp.css";
 import { useState } from "react";
+import signature from '../../assets/images/Signature Doc Agnes.png'
 
 function PassSlipTemp({ request }) {
   const [selectedOption, setSelectedOption] = useState(
@@ -121,6 +122,7 @@ function PassSlipTemp({ request }) {
             </div>
             <div className="approve__by">
               <p className="approved__by">APPROVED BY:</p>
+              <div className="sign_div"><img src={signature} className="signature__img" alt="" /></div>
               <h5 className="modal__h5">AGNES E. FERNANDO, Ed. D. MPA, MN</h5>
               <p className="printed__name">DMO-V/PHTL</p>
               <p className="printed__name">

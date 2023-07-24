@@ -11,6 +11,7 @@ import axios from "axios";
 import io from "socket.io-client";
 import DashboardTable from "./DashboardTable";
 import { compareDateTime } from "./DashboardTable";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
   const [requestAllData, setRequestAllData] = useState([]);
@@ -20,7 +21,7 @@ function Dashboard() {
   const [completedCount, setCompletedCount] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
   const [approvedCount, setApprovedCount] = useState(0);
-
+  const navigate = useNavigate();
   const handleRequestData = async () => {
     const Pending = 1;
     try {

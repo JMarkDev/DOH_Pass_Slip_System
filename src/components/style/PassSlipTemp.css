@@ -12,6 +12,10 @@
       display: block;
       page-break-before: auto;
     }
+
+    .sign_div{
+        margin-bottom: 25px;
+    }
   }
   
 
@@ -44,7 +48,6 @@
 
 .modal__h5{
     border-bottom: 1px solid black;
-    /* margin: 0 20px; */
     text-align: center;
 }
 
@@ -55,3 +58,15 @@
 .printed__name{
     text-align: center;
 }
+
+.signature__img{
+    width: 250px;
+    height: 100px;
+    position: absolute;
+    top: 420px;
+    margin-left: 80px;
+}
+
+/* .sign_div{
+    position: absolute;
+} */
